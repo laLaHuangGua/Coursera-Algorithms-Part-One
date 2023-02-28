@@ -7,52 +7,51 @@ import edu.princeton.cs.algs4.StdRandom;
 
 public class RandomizedQueue<Item> implements Iterable<Item> {
 
-  private static final int INITIAL_CAPACITY = 6;
   private Item[] items;
-  private int N;
+  private int n;
 
   public RandomizedQueue() {
-    items = (Item[]) new Object[INITIAL_CAPACITY];
-    N = 0;
+    items = (Item[]) new Object[6];
+    n = 0;
   }
 
   public boolean isEmpty() {
-    return N == 0;
+    return n == 0;
   }
 
   public int size() {
-    return N;
+    return n;
   }
 
   public void enqueue(Item item) {
     if (item == null)
       throw new IllegalArgumentException("Argument can't be null");
-    if (items.length == N)
+    if (items.length == n)
       resize(2 * items.length);
-    items[N++] = item;
+    items[n++] = item;
   }
 
   public Item dequeue() {
     if (this.isEmpty())
       throw new NoSuchElementException("Queue is empty");
-    if (N > 0 && N == items.length / 4)
+    if (n > 0 && n == items.length / 4)
       resize(items.length / 2);
 
-    int target = StdRandom.uniformInt(N);
+    int target = StdRandom.uniformInt(n);
 
     Item temp = items[target];
-    items[target] = items[N - 1];
-    items[N - 1] = temp;
+    items[target] = items[n - 1];
+    items[n - 1] = temp;
 
-    Item item = items[--N];
-    items[N] = null;
+    Item item = items[--n];
+    items[n] = null;
 
     return item;
   }
 
   private void resize(int capacity) {
     Item[] copy = (Item[]) new Object[capacity];
-    for (int i = 0; i < N; i++)
+    for (int i = 0; i < n; i++)
       copy[i] = items[i];
     items = copy;
   }
@@ -60,7 +59,7 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
   public Item sample() {
     if (this.isEmpty())
       throw new NoSuchElementException("Queue is empty");
-    int target = StdRandom.uniformInt(N);
+    int target = StdRandom.uniformInt(n);
     return items[target];
   }
 
@@ -75,8 +74,8 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
 
     public RandomizedQueueIterator() {
       count = 0;
-      int[] normalOrder = new int[N];
-      for (int i = 0; i < N; i++)
+      int[] normalOrder = new int[n];
+      for (int i = 0; i < n; i++)
         normalOrder[i] = i;
       StdRandom.shuffle(normalOrder);
       randomOrder = normalOrder;
@@ -89,7 +88,7 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
 
     @Override
     public boolean hasNext() {
-      return count < N;
+      return count < n;
     }
 
     @Override
