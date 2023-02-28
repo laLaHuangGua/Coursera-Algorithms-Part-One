@@ -13,10 +13,10 @@ public class Permutation {
     }
 
     for (String each : queue) {
-      System.out.println(each);
       count--;
-      if (count <= 0)
+      if (count < 0)
         break;
+      System.out.println(each);
     }
   }
 }
