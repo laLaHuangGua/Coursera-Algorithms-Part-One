@@ -1,3 +1,4 @@
+// Attempt1: get scores 99/100, fail in styles and a corner case
 package DRQ.codes.attempt1;
 
 import edu.princeton.cs.algs4.StdIn;
