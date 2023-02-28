@@ -1,3 +1,4 @@
+// Attempt2: get scores 100/100, still fail in style
 package DRQ.codes.attempt2;
 
 import edu.princeton.cs.algs4.StdIn;
