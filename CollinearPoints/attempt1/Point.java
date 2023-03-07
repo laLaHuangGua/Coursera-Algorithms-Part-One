@@ -61,9 +61,18 @@ public class Point implements Comparable<Point> {
    * @return the slope between this point and the specified point
    */
   public double slopeTo(Point that) {
-    /* YOUR CODE HERE */
-    return x;
+    boolean hasSameX = (x == that.x);
+    boolean hasSameY = (y == that.y);
 
+    if (hasSameX && hasSameY)
+      return Double.NEGATIVE_INFINITY;
+
+    if (hasSameX)
+      return Double.POSITIVE_INFINITY;
+    else if (hasSameY)
+      return +0.0;
+    else
+      return (that.y - y) / (double) (that.x - x);
   }
 
   /**
@@ -79,8 +88,19 @@ public class Point implements Comparable<Point> {
    *         argument point
    */
   public int compareTo(Point that) {
-    /* YOUR CODE HERE */
-    return x;
+    if (y < that.y || (y == that.y && x < that.x))
+      return -1;
+    if (y == that.y && x == that.x)
+      return 0;
+    return +1;
+  }
+
+  private class SlopeOrder implements Comparator<Point> {
+
+    @Override
+    public int compare(Point o1, Point o2) {
+      return Double.compare(slopeTo(o1), slopeTo(o2));
+    }
   }
 
   /**
@@ -90,8 +110,7 @@ public class Point implements Comparable<Point> {
    * @return the Comparator that defines this ordering on points
    */
   public Comparator<Point> slopeOrder() {
-    return null;
-    /* YOUR CODE HERE */
+    return new SlopeOrder();
   }
 
   /**
@@ -110,6 +129,18 @@ public class Point implements Comparable<Point> {
    * Unit tests the Point data type.
    */
   public static void main(String[] args) {
-    /* YOUR CODE HERE */
+    var o1 = new Point(0, 1);
+    var o3 = new Point(-1, 3);
+    var o4 = new Point(2, 1);
+    var o5 = new Point(-1, 2);
+
+    Comparator<Point> c = o1.slopeOrder();
+
+    System.out.println(c.compare(o4, o3));
+    System.out.println(c.compare(o4, o5));
+
+    Point[] points = { o3, o4, o5 };
+    for (var each : points)
+      System.out.println(o1.compareTo(each));
   }
 }
