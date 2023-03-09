@@ -8,8 +8,8 @@ import edu.princeton.cs.algs4.StdDraw;
 import edu.princeton.cs.algs4.StdOut;
 
 public class FastCollinearPoints {
-  ArrayList<LineSegment> lineSegments = new ArrayList<LineSegment>();
-  ArrayList<Double> segmentSlops = new ArrayList<Double>();
+  private ArrayList<LineSegment> lineSegments = new ArrayList<LineSegment>();
+  private ArrayList<Double> segmentSlops = new ArrayList<Double>();
 
   public FastCollinearPoints(Point[] points) {
     if (points == null)

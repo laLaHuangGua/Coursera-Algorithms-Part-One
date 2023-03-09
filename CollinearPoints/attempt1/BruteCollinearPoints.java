@@ -7,7 +7,7 @@ import edu.princeton.cs.algs4.StdDraw;
 import edu.princeton.cs.algs4.StdOut;
 
 public class BruteCollinearPoints {
-  LineSegment[] lineSegments;
+  private LineSegment[] lineSegments;
 
   public BruteCollinearPoints(Point[] points) {
     if (points == null)
