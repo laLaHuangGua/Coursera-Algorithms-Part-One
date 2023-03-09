@@ -14,7 +14,13 @@ public class FastCollinearPoints {
   public FastCollinearPoints(Point[] points) {
     if (points == null)
       throw new IllegalArgumentException("Null object occurs");
-    scanPoints(points);
+
+    Point[] po = new Point[points.length];
+    for (int i = 0; i < points.length; i++) {
+      validateNullPoint(points[i]);
+      po[i] = points[i];
+    }
+    scanPoints(po);
   }
 
   public int numberOfSegments() {
@@ -32,6 +38,8 @@ public class FastCollinearPoints {
   }
 
   private void scanPoints(Point[] po) {
+    if (po.length <= 1)
+      return;
     Point[] initPo = new Point[po.length];
     for (int index = 0; index < po.length; index++)
       initPo[index] = po[index];
@@ -44,8 +52,9 @@ public class FastCollinearPoints {
       int start = 1;
       double slop = slopBetween(initPo[i], po[1]);
 
-      while (n < po.length - 1) {
-        if (Double.compare(slop, slopBetween(initPo[i], po[++n])) == 0)
+      while (n < po.length) {
+        if (n < po.length - 1
+            && Double.compare(slop, slopBetween(initPo[i], po[++n])) == 0)
           steps++;
         else {
           if (steps >= 3) {
@@ -64,6 +73,8 @@ public class FastCollinearPoints {
               segmentSlops.add(slop);
             }
           }
+          if (n == po.length - 1)
+            break;
           start = n;
           steps = 1;
           slop = initPo[i].slopeTo(po[n]);
@@ -73,8 +84,6 @@ public class FastCollinearPoints {
   }
 
   private double slopBetween(Point po1, Point po2) {
-    validateNullPoint(po1);
-    validateNullPoint(po2);
     double slopToPo2 = po1.slopeTo(po2);
     validateRepeatedPoint(slopToPo2);
     return slopToPo2;
