@@ -1,3 +1,4 @@
+// Attempt1: get scores 72/100, fail in correctness
 package attempt1;
 
 import java.util.ArrayList;
