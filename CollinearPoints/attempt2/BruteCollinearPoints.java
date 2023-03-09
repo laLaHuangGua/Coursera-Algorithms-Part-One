@@ -13,16 +13,24 @@ public class BruteCollinearPoints {
     if (points == null)
       throw new IllegalArgumentException("Null object occurs");
     lineSegments = new LineSegment[points.length];
-    scanPoints(points);
+
+    Point[] po = new Point[points.length];
+    for (int i = 0; i < points.length; i++) {
+      validateNullPoint(points[i]);
+      po[i] = points[i];
+    }
+    scanPoints(po);
   }
 
   public int numberOfSegments() {
     return lineSegments.length;
-
   }
 
   public LineSegment[] segments() {
-    return lineSegments;
+    LineSegment[] copyOfLineSegments = new LineSegment[lineSegments.length];
+    for (int i = 0; i < lineSegments.length; i++)
+      copyOfLineSegments[i] = lineSegments[i];
+    return copyOfLineSegments;
   }
 
   private void scanPoints(Point[] po) {
@@ -50,8 +58,6 @@ public class BruteCollinearPoints {
   }
 
   private double slopBetween(Point po1, Point po2) {
-    validateNullPoint(po1);
-    validateNullPoint(po2);
     double slopToPo2 = po1.slopeTo(po2);
     validateRepeatedPoint(slopToPo2);
     return slopToPo2;
