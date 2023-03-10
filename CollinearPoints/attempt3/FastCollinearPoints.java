@@ -1,6 +1,5 @@
 package attempt3;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 
 import edu.princeton.cs.algs4.In;
@@ -8,15 +7,23 @@ import edu.princeton.cs.algs4.StdDraw;
 import edu.princeton.cs.algs4.StdOut;
 
 public class FastCollinearPoints {
-  private ArrayList<LineSegment> lineSegments = new ArrayList<LineSegment>();
-  private ArrayList<Double> segmentSlops = new ArrayList<Double>();
+  private Point[] heads;
+  private Point[] ends;
+  private double[] slops;
+  private int count;
 
   public FastCollinearPoints(Point[] points) {
     if (points == null)
       throw new IllegalArgumentException("Null object occurs");
 
-    Point[] po = new Point[points.length];
-    for (int i = 0; i < points.length; i++) {
+    int size = points.length;
+    count = 0;
+    heads = new Point[size];
+    ends = new Point[size];
+    slops = new double[size];
+
+    Point[] po = new Point[size];
+    for (int i = 0; i < size; i++) {
       validateNullPoint(points[i]);
       po[i] = points[i];
     }
@@ -24,61 +31,66 @@ public class FastCollinearPoints {
   }
 
   public int numberOfSegments() {
-    return lineSegments.size();
+    return count;
   }
 
   public LineSegment[] segments() {
-    LineSegment[] arrayLinesegments = new LineSegment[lineSegments.size()];
-    int i = 0;
-    for (var each : lineSegments) {
-      arrayLinesegments[i] = each;
-      i++;
-    }
-    return arrayLinesegments;
+    LineSegment[] lineSegments = new LineSegment[count];
+    for (int i = 0; i < count; i++)
+      lineSegments[i] = new LineSegment(heads[i], ends[i]);
+    return lineSegments;
   }
 
   private void scanPoints(Point[] po) {
-    if (po.length <= 1)
+    int poSize = po.length;
+    int maxIndex = poSize - 1;
+
+    if (poSize <= 1)
       return;
-    Point[] initPo = new Point[po.length];
-    for (int index = 0; index < po.length; index++)
+    Point[] initPo = new Point[poSize];
+    for (int index = 0; index < poSize; index++)
       initPo[index] = po[index];
 
-    for (int i = 0; i < po.length; i++) {
+    for (int i = 0; i < poSize; i++) {
       Arrays.sort(po, initPo[i].slopeOrder());
 
       int n = 1;
       int steps = 1;
       int start = 1;
+      boolean flag = true;
       double slop = slopBetween(initPo[i], po[1]);
 
-      while (n < po.length) {
-        if (n < po.length - 1
-            && Double.compare(slop, slopBetween(initPo[i], po[++n])) == 0)
-          steps++;
-        else {
-          if (steps >= 3) {
-            int size = n - start + 1;
-            Point[] collinearPoints = new Point[size];
-
-            collinearPoints[0] = initPo[i];
-            for (int j = start, k = 1; k < size; j++, k++)
-              collinearPoints[k] = po[j];
-            Arrays.sort(collinearPoints);
-
-            if (!segmentSlops.contains(slop)) {
-              lineSegments.add(
-                  new LineSegment(
-                      collinearPoints[0], collinearPoints[size - 1]));
-              segmentSlops.add(slop);
-            }
+      while (n < poSize) {
+        if (n < maxIndex) {
+          if (Double.compare(slop, slopBetween(initPo[i], po[++n])) != 0)
+            flag = false;
+          if (flag) {
+            steps++;
+            continue;
           }
-          if (n == po.length - 1)
-            break;
-          start = n;
-          steps = 1;
-          slop = initPo[i].slopeTo(po[n]);
         }
+
+        boolean nIsReachEnd = (n == maxIndex);
+        if (steps >= 3) {
+          int size = n - start + 1;
+          if (nIsReachEnd && flag)
+            size++;
+
+          Point[] collinearPoints = new Point[size];
+          collinearPoints[0] = initPo[i];
+          for (int j = start, k = 1; k < size; j++, k++)
+            collinearPoints[k] = po[j];
+          Arrays.sort(collinearPoints);
+
+          addOrDropIfExists(collinearPoints[0], collinearPoints[size - 1], slop);
+        }
+
+        if (nIsReachEnd)
+          break;
+        start = n;
+        steps = 1;
+        flag = true;
+        slop = initPo[i].slopeTo(po[n]);
       }
     }
   }
@@ -87,6 +99,23 @@ public class FastCollinearPoints {
     double slopToPo2 = po1.slopeTo(po2);
     validateRepeatedPoint(slopToPo2);
     return slopToPo2;
+  }
+
+  private void addOrDropIfExists(Point head, Point end, double slop) {
+    boolean lineIsExists = false;
+    for (int i = 0; i < count; i++) {
+      if (slops[i] == slop && heads[i].compareTo(head) == 0) {
+        lineIsExists = true;
+        break;
+      }
+    }
+
+    if (!lineIsExists) {
+      heads[count] = head;
+      ends[count] = end;
+      slops[count] = slop;
+      count++;
+    }
   }
 
   private void validateRepeatedPoint(double slop) {
