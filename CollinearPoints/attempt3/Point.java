@@ -1,3 +1,4 @@
+// Attempt3: get scores 85/100, 'index out of bound' occurs
 package attempt3;
 
 /******************************************************************************
