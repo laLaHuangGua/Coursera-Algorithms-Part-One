@@ -1,5 +1,6 @@
 package attempt4;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 
 import edu.princeton.cs.algs4.In;
@@ -7,20 +8,15 @@ import edu.princeton.cs.algs4.StdDraw;
 import edu.princeton.cs.algs4.StdOut;
 
 public class FastCollinearPoints {
-  private Point[] heads;
-  private Point[] ends;
-  private double[] slops;
-  private int count;
+  private ArrayList<Point> heads = new ArrayList<Point>();
+  private ArrayList<Point> ends = new ArrayList<Point>();
+  private ArrayList<Double> slops = new ArrayList<Double>();
 
   public FastCollinearPoints(Point[] points) {
     if (points == null)
       throw new IllegalArgumentException("Null object occurs");
 
     int size = points.length;
-    count = 0;
-    heads = new Point[size];
-    ends = new Point[size];
-    slops = new double[size];
 
     Point[] po = new Point[size];
     for (int i = 0; i < size; i++) {
@@ -31,13 +27,13 @@ public class FastCollinearPoints {
   }
 
   public int numberOfSegments() {
-    return count;
+    return heads.size();
   }
 
   public LineSegment[] segments() {
-    LineSegment[] lineSegments = new LineSegment[count];
-    for (int i = 0; i < count; i++)
-      lineSegments[i] = new LineSegment(heads[i], ends[i]);
+    LineSegment[] lineSegments = new LineSegment[heads.size()];
+    for (int i = 0; i < heads.size(); i++)
+      lineSegments[i] = new LineSegment(heads.get(i), ends.get(i));
     return lineSegments;
   }
 
@@ -61,8 +57,10 @@ public class FastCollinearPoints {
       double slop = slopBetween(initPo[i], po[1]);
 
       while (n < poSize) {
+        double slopNext = 0.0;
         if (n < maxIndex) {
-          if (Double.compare(slop, slopBetween(initPo[i], po[++n])) != 0)
+          slopNext = slopBetween(initPo[i], po[++n]);
+          if (Double.compare(slop, slopNext) != 0)
             flag = false;
           if (flag) {
             steps++;
@@ -90,7 +88,7 @@ public class FastCollinearPoints {
         start = n;
         steps = 1;
         flag = true;
-        slop = initPo[i].slopeTo(po[n]);
+        slop = slopNext;
       }
     }
   }
@@ -103,18 +101,17 @@ public class FastCollinearPoints {
 
   private void addOrDropIfExists(Point head, Point end, double slop) {
     boolean lineIsExists = false;
-    for (int i = 0; i < count; i++) {
-      if (slops[i] == slop && heads[i].compareTo(head) == 0) {
+    for (int i = 0; i < heads.size(); i++) {
+      if (slops.get(i) == slop && heads.get(i).compareTo(head) == 0) {
         lineIsExists = true;
         break;
       }
     }
 
     if (!lineIsExists) {
-      heads[count] = head;
-      ends[count] = end;
-      slops[count] = slop;
-      count++;
+      heads.add(head);
+      ends.add(end);
+      slops.add(slop);
     }
   }
 
