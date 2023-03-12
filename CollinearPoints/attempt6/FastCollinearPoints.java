@@ -1,3 +1,4 @@
+// Attempt6: get scores 97/100(use inner class), fail in timing
 package attempt6;
 
 import java.util.ArrayList;
