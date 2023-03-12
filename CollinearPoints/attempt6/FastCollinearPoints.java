@@ -12,6 +12,21 @@ public class FastCollinearPoints {
   private ArrayList<Double> slops = new ArrayList<Double>();
   private ArrayList<LineSegment> lineSegments = new ArrayList<LineSegment>();
 
+  private static class NewPoint implements Comparable<NewPoint> {
+    Point point;
+    double slop;
+
+    public NewPoint(Point po, double s) {
+      point = po;
+      slop = s;
+    }
+
+    @Override
+    public int compareTo(NewPoint that) {
+      return Double.compare(slop, that.slop);
+    }
+  }
+
   public FastCollinearPoints(Point[] points) {
     if (points == null)
       throw new IllegalArgumentException("Null object occurs");
@@ -34,9 +49,8 @@ public class FastCollinearPoints {
 
   public LineSegment[] segments() {
     LineSegment[] lineSegmentsArray = new LineSegment[lineSegments.size()];
-    int i = 0;
-    for (var each : lineSegments)
-      lineSegmentsArray[i++] = each;
+    for (int i = 0; i < lineSegments.size(); i++)
+      lineSegmentsArray[i] = lineSegments.get(i);
     return lineSegmentsArray;
   }
 
@@ -46,24 +60,29 @@ public class FastCollinearPoints {
 
     if (poSize <= 3)
       return;
-    Point[] initPo = new Point[poSize];
-    for (int index = 0; index < poSize; index++)
-      initPo[index] = po[index];
 
     for (int i = 0; i < poSize; i++) {
-      Arrays.sort(po, initPo[i].slopeOrder());
 
-      double[] iSlops = new double[po.length];
-      iSlops[0] = Double.NEGATIVE_INFINITY;
-      for (int j = 1; j < po.length; j++)
-        iSlops[j] = initPo[i].slopeTo(po[j]);
+      NewPoint[] newPo = new NewPoint[poSize];
+      for (int j = 0; j < poSize; j++) {
+        if (j == 0)
+          newPo[j] = new NewPoint(po[j], Double.NEGATIVE_INFINITY);
+        else
+          newPo[j] = new NewPoint(po[j], po[i].slopeTo(po[j]));
+      }
+
+      Arrays.sort(newPo);
+
+      // double[] iSlops = new double[poSize];
+      // for (int j = 0; j < poSize; j++)
+      // iSlops[j] = newPo[j].slop;
 
       int n = 1;
       int start = 1;
       boolean match = false;
 
       while (n < maxIndex) {
-        match = equal(iSlops[start], iSlops[++n]);
+        match = equal(newPo[start].slop, newPo[++n].slop);
         if (match && n != maxIndex) {
           continue;
         } else {
@@ -73,10 +92,10 @@ public class FastCollinearPoints {
 
           if (size >= 4) {
             Point[] collinrPo = new Point[size];
-            collinrPo[0] = initPo[i];
+            collinrPo[0] = po[i];
             for (int j = start, k = 1; k < size; j++, k++)
-              collinrPo[k] = po[j];
-            addOrDropIfExists(collinrPo, iSlops[start]);
+              collinrPo[k] = newPo[j].point;
+            addOrDropIfExists(collinrPo, newPo[start].slop);
           }
 
           if (n >= maxIndex - 1)
