@@ -135,12 +135,8 @@ public class Board {
   }
 
   private int[][] swapBlankTileTo(int destRow, int destCol) {
-    int[][] aCopy = new int[tiles.length][];
-    for (int i = 0; i < tiles.length; i++)
-      aCopy[i] = tiles[i];
+    int[][] aCopy = copyOf(tiles);
 
-    System.out.println("Before swap tiles: ");
-    System.out.println(new Board(tiles).toString());
     int temp = aCopy[destRow][destCol];
     aCopy[destRow][destCol] = aCopy[blankTileRow][blankTileCol];
     aCopy[blankTileRow][blankTileCol] = temp;
@@ -163,12 +159,14 @@ public class Board {
     return directions;
   }
 
-  // private int[][] copyOf(int[][] origin) {
-  // int[][] aCopy = new int[origin.length][];
-  // for (int i = 0; i < origin.length; i++)
-  // aCopy[i] = origin[i];
-  // return aCopy;
-  // }
+  private int[][] copyOf(int[][] origin) {
+    int size = origin.length;
+    int[][] aCopy = new int[size][size];
+    for (int i = 0; i < size; i++)
+      for (int j = 0; j < size; j++)
+        aCopy[i][j] = origin[i][j];
+    return aCopy;
+  }
 
   // unit testing (not graded)
   public static void main(String[] args) {
@@ -184,5 +182,7 @@ public class Board {
     for (var each : initial.neighbors()) {
       System.out.println(each);
     }
+
+    System.out.println(initial.twin());
   }
 }
