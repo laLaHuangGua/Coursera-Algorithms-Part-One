@@ -106,10 +106,13 @@ public class Board {
   }
 
   public Board twin() {
-    if (blankTileRow + 1 <= dimension)
-      return new Board(swapBlankTileTo(blankTileRow + 1, blankTileCol));
-    else
-      return new Board(swapBlankTileTo(blankTileRow - 1, blankTileCol));
+    int[][] aCopy = copyOf(tiles);
+    int startRow = blankTileRow == 1 ? 2 : 1;
+
+    int temp = aCopy[startRow][1];
+    aCopy[startRow][1] = aCopy[startRow][2];
+    aCopy[startRow][2] = temp;
+    return new Board(aCopy);
   }
 
   private int bias(int n, boolean flag) {
