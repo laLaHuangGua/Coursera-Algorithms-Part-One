@@ -27,7 +27,7 @@ public class Solver {
     public boolean equals(Object obj) {
       if (obj == null)
         return false;
-      if (obj.getClass() != Node.class)
+      if (obj.getClass() != this.getClass())
         return false;
       Node objNode = (Node) obj;
       return board.equals(objNode.board);
@@ -42,6 +42,14 @@ public class Solver {
       return 0;
     }
 
+    @Override
+    public int hashCode() {
+      final int prime = 31;
+      int result = 1;
+      result = prime * result + moves;
+      result = prime * result + priority;
+      return result;
+    }
   }
 
   // find a solution to the initial board (using the A* algorithm)
@@ -80,7 +88,7 @@ public class Solver {
       queuMinPQ.insert(new Node(each, initNode));
     Node current = queuMinPQ.delMin();
 
-    while (current.board.manhattan() != 0) {
+    while (!current.board.isGoal()) {
       Board currentPrevBoard = current.prev.board;
 
       for (var board : current.board.neighbors())
@@ -91,10 +99,15 @@ public class Solver {
     }
 
     int moves = current.moves;
+    ArrayList<Board> temp = new ArrayList<Board>();
     while (current != null) {
-      solution.add(current.board);
+      temp.add(current.board);
       current = current.prev;
     }
+
+    for (int i = temp.size() - 1; i >= 0; i--)
+      solution.add(temp.get(i));
+
     return moves;
   }
 

@@ -26,7 +26,7 @@ public class Board {
     int distance = 0;
     int blankTileRowLocal = 0;
     int blankTileColLocal = 0;
-    String stringBoard = dimension + "\n";
+    StringBuilder stringBoard = new StringBuilder(dimension + "\n");
 
     int n = dimension + 1;
     this.tiles = new int[n][n];
@@ -47,12 +47,12 @@ public class Board {
           wrongTiles++;
           distance += computeDistanceFromGoalTo(row, col, tileVal);
         }
-        stringBoard += tiles[i][j] + " ";
+        stringBoard.append(tiles[i][j] + " ");
       }
-      stringBoard += "\n";
+      stringBoard.append("\n");
     }
 
-    tilesString = stringBoard;
+    tilesString = stringBoard.toString();
     hamming = wrongTiles;
     manhattan = distance;
     blankTileRow = blankTileRowLocal;
@@ -79,14 +79,18 @@ public class Board {
     return hamming == 0;
   }
 
-  public boolean equals(Object y) {
-    if (y == null)
-      return false;
-
-    Board that = (Board) y;
-    if (that.dimension == dimension && Arrays.equals(that.tiles, tiles))
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj)
       return true;
-    return false;
+    if (obj == null)
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
+    Board other = (Board) obj;
+    if (!Arrays.deepEquals(tiles, other.tiles))
+      return false;
+    return true;
   }
 
   public Iterable<Board> neighbors() {
