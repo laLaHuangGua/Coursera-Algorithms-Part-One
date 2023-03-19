@@ -24,13 +24,24 @@ public class Solver {
     }
 
     @Override
+    public boolean equals(Object obj) {
+      if (obj == null)
+        return false;
+      if (obj.getClass() != Node.class)
+        return false;
+      Node objNode = (Node) obj;
+      return board.equals(objNode.board);
+    }
+
+    @Override
     public int compareTo(Node that) {
       if (priority > that.priority)
         return 1;
-      if (priority < that.priority)
+      else if (priority < that.priority)
         return -1;
       return 0;
     }
+
   }
 
   // find a solution to the initial board (using the A* algorithm)
@@ -38,47 +49,12 @@ public class Solver {
     if (initial == null)
       throw new IllegalArgumentException("Argument is null");
 
-    Node initNode = new Node(initial, null);
-    Node initNodeTwin = new Node(initial.twin(), null);
-
-    MinPQ<Node> queuMinPQ = initializeQueue(initial, initNode);
-    MinPQ<Node> queuMinPQTwin = initializeQueue(initial.twin(), initNodeTwin);
-
     solution = new ArrayList<Board>();
-    solution.add(initNode.board);
-
-    Node current = queuMinPQ.delMin();
-    Node currentTwin = queuMinPQTwin.delMin();
-    while (current.board.manhattan() != 0 && currentTwin.board.manhattan() != 0) {
-      solution.add(current.board);
-      for (var each : current.board.neighbors()) {
-        boolean flag = false;
-        if (!flag && each.equals(current.prev.board)) {
-          flag = true;
-          continue;
-        }
-        queuMinPQ.insert(new Node(each, current));
-      }
-      current = queuMinPQ.delMin();
-
-      for (var each : currentTwin.board.neighbors()) {
-        boolean flag = false;
-        if (!flag && each.equals(currentTwin.prev.board)) {
-          flag = true;
-          continue;
-        }
-        queuMinPQTwin.insert(new Node(each, currentTwin));
-      }
-      currentTwin = queuMinPQTwin.delMin();
-    }
-
-    if (currentTwin.board.manhattan() == 0) {
-      solution.clear();
-      solutionMoves = -1;
-    } else {
-      solution.add(current.board);
-      solutionMoves = current.moves;
-    }
+    if (initial.manhattan() == 0) {
+      solutionMoves = 0;
+      solution.add(initial);
+    } else
+      solutionMoves = search(initial);
   }
 
   // is the initial board solvable? (see below)
@@ -96,13 +72,30 @@ public class Solver {
     return solution;
   }
 
-  private MinPQ<Node> initializeQueue(Board initial, Node initNode) {
+  private int search(Board initial) {
+    Node initNode = new Node(initial, null);
     MinPQ<Node> queuMinPQ = new MinPQ<Node>();
-    for (var each : initial.neighbors()) {
-      Node eachNode = new Node(each, initNode);
-      queuMinPQ.insert(eachNode);
+
+    for (var each : initial.neighbors())
+      queuMinPQ.insert(new Node(each, initNode));
+    Node current = queuMinPQ.delMin();
+
+    while (current.board.manhattan() != 0) {
+      Board currentPrevBoard = current.prev.board;
+
+      for (var board : current.board.neighbors())
+        if (!board.equals(currentPrevBoard))
+          queuMinPQ.insert(new Node(board, current));
+
+      current = queuMinPQ.delMin();
     }
-    return queuMinPQ;
+
+    int moves = current.moves;
+    while (current != null) {
+      solution.add(current.board);
+      current = current.prev;
+    }
+    return moves;
   }
 
   // test client (see below)
