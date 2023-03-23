@@ -1,45 +1,91 @@
 package KdTrees.attempt1;
 
+import java.util.ArrayList;
+
+import edu.princeton.cs.algs4.In;
 import edu.princeton.cs.algs4.Point2D;
 import edu.princeton.cs.algs4.RectHV;
+import edu.princeton.cs.algs4.SET;
 
 public class PointSET {
-  // construct an empty set of points
+  private SET<Point2D> pointSet;
+
   public PointSET() {
+    pointSet = new SET<Point2D>();
   }
 
   public boolean isEmpty() {
-    return false;
+    return pointSet.isEmpty();
   }
 
-  // number of points in the set
   public int size() {
-    return 0;
+    return pointSet.size();
   }
 
-  // add the point to the set (if it is not already in the set)
   public void insert(Point2D p) {
+    if (p == null)
+      throw new IllegalArgumentException();
+
+    if (!pointSet.contains(p))
+      pointSet.add(p);
   }
 
-  // does the set contain point p?
   public boolean contains(Point2D p) {
-    return false;
+    if (p == null)
+      throw new IllegalArgumentException();
+    return pointSet.contains(p);
   }
 
-  // draw all points to standard draw
   public void draw() {
+    for (var each : pointSet)
+      each.draw();
   }
 
-  // all points that are inside the rectangle (or on the boundary)
   public Iterable<Point2D> range(RectHV rect) {
-    return null;
+    if (rect == null)
+      throw new IllegalArgumentException();
+
+    ArrayList<Point2D> pointsInRange = new ArrayList<Point2D>();
+    for (var each : pointSet) {
+      if (each.x() < rect.xmin()
+          || each.x() > rect.xmax()
+          || each.y() < rect.ymin()
+          || each.y() > rect.ymax())
+        continue;
+      pointsInRange.add(each);
+    }
+    return pointsInRange;
   }
 
-  // a nearest neighbor in the set to point p; null if the set is empty
   public Point2D nearest(Point2D p) {
-    return p;
+    if (p == null)
+      throw new IllegalArgumentException();
+    if (pointSet.isEmpty())
+      return null;
+
+    Point2D closestPoint = null;
+    double minDistance = 10.0;
+    for (var each : pointSet) {
+      if (minDistance > p.distanceTo(each)) {
+        closestPoint = each;
+        minDistance = p.distanceTo(each);
+      }
+    }
+    return closestPoint;
   }
 
   public static void main(String[] args) {
+    String filename = args[0];
+    In in = new In(filename);
+    PointSET brute = new PointSET();
+
+    while (!in.isEmpty()) {
+      double x = in.readDouble();
+      double y = in.readDouble();
+      Point2D p = new Point2D(x, y);
+      brute.insert(p);
+    }
+
+    System.out.println(brute.nearest(new Point2D(0.100, 0.100)));
   }
 }
