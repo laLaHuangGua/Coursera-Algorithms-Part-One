@@ -1,3 +1,4 @@
+// Attempt1: get scores 65/100
 package KdTrees.attempt1;
 
 import java.util.ArrayList;
