@@ -1,5 +1,7 @@
+// Attempt2: get scores 97/100, fail in correctness
 package KdTrees.attempt2;
 
+import edu.princeton.cs.algs4.In;
 import edu.princeton.cs.algs4.Point2D;
 import edu.princeton.cs.algs4.Queue;
 import edu.princeton.cs.algs4.RectHV;
@@ -10,7 +12,7 @@ public class KdTree {
   private Node root = null;
   private int size = 0;
 
-  private class Node implements Comparable<Node> {
+  private static class Node {
     Point2D point;
     Node parent;
     Node left;
@@ -22,7 +24,6 @@ public class KdTree {
       this.point = p;
     }
 
-    @Override
     public int compareTo(Node that) {
       if (that.flag == X_COORDINATE)
         return Double.compare(point.x(), that.point.x());
@@ -42,6 +43,28 @@ public class KdTree {
     return size;
   }
 
+  public boolean contains(Point2D p) {
+    if (p == null)
+      throw new IllegalArgumentException();
+
+    Node x = root;
+    Node node = new Node(p);
+    boolean isExists = false;
+
+    while (x != null) {
+      int cmp = node.compareTo(x);
+      if (cmp >= 0) {
+        if (cmp == 0 && node.point.equals(x.point)) {
+          isExists = true;
+          break;
+        }
+        x = x.right;
+      } else
+        x = x.left;
+    }
+    return isExists;
+  }
+
   public void insert(Point2D p) {
     if (p == null)
       throw new IllegalArgumentException();
@@ -50,6 +73,7 @@ public class KdTree {
       root.flag = X_COORDINATE;
       root.parent = null;
       root.rect = new RectHV(0, 0, 1, 1);
+      size++;
       return;
     }
 
@@ -68,9 +92,9 @@ public class KdTree {
 
     p.parent = x;
     int cmp = p.compareTo(x);
-    if (cmp > 0)
+    if (cmp >= 0)
       x.right = put(x.right, p, cmp);
-    else if (cmp < 0)
+    else
       x.left = put(x.left, p, cmp);
     return x;
   }
@@ -109,29 +133,6 @@ public class KdTree {
             parent.rect.xmax(),
             parent.rect.ymax());
     }
-  }
-
-  public boolean contains(Point2D p) {
-    if (p == null)
-      throw new IllegalArgumentException();
-
-    Node x = root;
-    Node node = new Node(p);
-    boolean isExists = false;
-
-    while (x != null) {
-      int cmp = node.compareTo(x);
-      if (cmp > 0)
-        x = x.right;
-      else if (cmp < 0)
-        x = x.left;
-      else {
-        if (node.point.compareTo(x.point) == 0)
-          isExists = true;
-        break;
-      }
-    }
-    return isExists;
   }
 
   public void draw() {
@@ -190,6 +191,8 @@ public class KdTree {
   public Point2D nearest(Point2D p) {
     if (p == null)
       throw new IllegalArgumentException();
+    if (root == null)
+      return null;
 
     Node x = root;
     Point2D nearest = new Point2D(root.point.x(), root.point.y());
@@ -202,19 +205,30 @@ public class KdTree {
     if (x == null)
       return null;
 
-    double distance = query.distanceTo(x.point);
-    boolean canGoLeft = x.left != null && x.left.point.distanceTo(query) < distance;
-    boolean canGoRight = x.right != null && x.right.point.distanceTo(query) < distance;
+    double nearestDistance = query.distanceSquaredTo(nearest);
+    double distance = query.distanceSquaredTo(x.point);
+    if (distance < nearestDistance)
+      nearest = x.point;
+    else
+      distance = nearestDistance;
+
+    boolean canGoLeft = x.left != null
+        && x.left.rect.distanceSquaredTo(query) <= distance;
+    boolean canGoRight = x.right != null
+        && x.right.rect.distanceSquaredTo(query) <= distance;
 
     if (canGoLeft && canGoRight) {
-      if (x.left.rect.contains(query))
-        nearest = search(x.left, query, x.left.point);
-      else if (x.right.rect.contains(query))
-        nearest = search(x.right, query, x.right.point);
+      if (x.left.rect.contains(query)) {
+        nearest = search(x.left, query, nearest);
+        nearest = search(x.right, query, nearest);
+      } else {
+        nearest = search(x.right, query, nearest);
+        nearest = search(x.left, query, nearest);
+      }
     } else if (canGoLeft && !canGoRight) {
-      nearest = search(x.left, query, x.left.point);
+      nearest = search(x.left, query, nearest);
     } else if (!canGoLeft && canGoRight) {
-      nearest = search(x.right, query, x.right.point);
+      nearest = search(x.right, query, nearest);
     } else {
       return nearest;
     }
@@ -222,22 +236,22 @@ public class KdTree {
   }
 
   public static void main(String[] args) {
+    String filename = args[0];
+    In in = new In(filename);
+    KdTree kdtree = new KdTree();
+    while (!in.isEmpty()) {
+      double x = in.readDouble();
+      double y = in.readDouble();
+      Point2D p = new Point2D(x, y);
+      kdtree.insert(p);
+    }
 
-    KdTree tree = new KdTree();
-    tree.insert(new Point2D(0.7, 0.2));
-    tree.insert(new Point2D(0.5, 0.4));
-    tree.insert(new Point2D(0.2, 0.3));
-    tree.insert(new Point2D(0.4, 0.7));
-    tree.insert(new Point2D(0.9, 0.6));
+    System.out.println(kdtree.nearest(new Point2D(0.8, 0.1)));
 
-    Point2D query = new Point2D(0.3, 0.2);
-    StdDraw.setPenColor(StdDraw.BLACK);
-    StdDraw.setPenRadius(0.01);
-    query.draw();
-
-    System.out.println(tree.nearest(query));
-    tree.draw();
-
-    StdDraw.show();
+    // StdDraw.clear();
+    // StdDraw.setPenColor(StdDraw.BLACK);
+    // StdDraw.setPenRadius(0.01);
+    // kdtree.draw();
+    // StdDraw.show();
   }
 }

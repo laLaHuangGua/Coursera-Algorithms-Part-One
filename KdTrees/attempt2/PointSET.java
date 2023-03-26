@@ -1,3 +1,4 @@
+// Attempt2: get scores 97/100, fail in correctness
 package KdTrees.attempt2;
 
 import java.util.ArrayList;
@@ -66,9 +67,9 @@ public class PointSET {
     Point2D closestPoint = null;
     double minDistance = 10.0;
     for (var each : pointSet) {
-      if (minDistance > p.distanceTo(each)) {
+      if (minDistance > p.distanceSquaredTo(each)) {
         closestPoint = each;
-        minDistance = p.distanceTo(each);
+        minDistance = p.distanceSquaredTo(each);
       }
     }
     return closestPoint;
