@@ -1,3 +1,4 @@
+// Attempt3: get scores 100/100, with ugly codes
 package KdTrees.attempt3;
 
 import java.util.ArrayList;
@@ -64,7 +65,7 @@ public class PointSET {
       return null;
 
     Point2D closestPoint = null;
-    double minDistance = 10.0;
+    double minDistance = Double.MAX_VALUE;
     for (var each : pointSet) {
       if (minDistance > p.distanceSquaredTo(each)) {
         closestPoint = each;

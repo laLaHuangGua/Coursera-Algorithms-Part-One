@@ -1,3 +1,4 @@
+// Attempt3: get scores 100/100, with ugly codes
 package KdTrees.attempt3;
 
 import edu.princeton.cs.algs4.In;
@@ -217,12 +218,15 @@ public class KdTree {
         && x.right.rect.distanceSquaredTo(query) <= distance;
 
     if (canGoLeft && canGoRight) {
-      if (x.left.rect.contains(query)) {
+      if ((x.flag == X_COORDINATE && query.x() < x.point.x())
+          || (x.flag != X_COORDINATE && query.y() < x.point.y())) {
         nearest = search(x.left, query, nearest);
-        nearest = search(x.right, query, nearest);
+        if (query.distanceSquaredTo(nearest) >= x.right.rect.distanceSquaredTo(query))
+          nearest = search(x.right, query, nearest);
       } else {
         nearest = search(x.right, query, nearest);
-        nearest = search(x.left, query, nearest);
+        if (query.distanceSquaredTo(nearest) >= x.left.rect.distanceSquaredTo(query))
+          nearest = search(x.left, query, nearest);
       }
     } else if (canGoLeft && !canGoRight) {
       nearest = search(x.left, query, nearest);
@@ -245,12 +249,11 @@ public class KdTree {
       kdtree.insert(p);
     }
 
-    System.out.println(kdtree.nearest(new Point2D(0.8, 0.1)));
-
     // StdDraw.clear();
     // StdDraw.setPenColor(StdDraw.BLACK);
     // StdDraw.setPenRadius(0.01);
     // kdtree.draw();
     // StdDraw.show();
+    kdtree.nearest(new Point2D(0.6875, 0.25));
   }
 }
