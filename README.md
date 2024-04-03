@@ -1,16 +1,13 @@
-## Coursera: Algorithms, Part 1
+# Coursera: Algorithms, Part 1
 
-### Outline
+This repo contains my codes and notes about assignments of this course.
 
----
+### Passed Assignments
 
-This repo contains my assignment codes and notes about my path to solving those assignments.
+- [Percolation](https://coursera.cs.princeton.edu/algs4/assignments/percolation/specification.php): get 100/100 points
+- [Deque and Randomized Queue (DRQ)](https://coursera.cs.princeton.edu/algs4/assignments/queues/specification.php): get 100/100 points
+- [Collinear Points](https://coursera.cs.princeton.edu/algs4/assignments/collinear/specification.php): get 97/100 points
+- [8 Puzzle](https://coursera.cs.princeton.edu/algs4/assignments/8puzzle/specification.php): get 91/100 points
+- [Kd-Trees](https://coursera.cs.princeton.edu/algs4/assignments/kdtree/specification.php): get 100/100 points
 
-**WARNING**: I am not good at writing English, but I want to practice. You may see some syntax errors in my README file or annotations, and you may come across Chinglish. I would appreciate it if you could figure out that.
-
----
-
-### Finished
-
-- Percolation: codes
-- Deque and Randomized Queue: codes
+I've passed all the assignments.
